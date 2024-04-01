@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body onload="loadDepartmentData()">
+    <h2>Departments</h2>
+    <h3>Hello to: <b id="username"></b> </h3>
+    <a href="./login.html">Log Out</a>
+    <a href="./homePage.html">Home Paga</a>
+    <br> <br>
+
+    <table border="1" id="table">
+        <tr>
+            <th>Department name</th>
+            <th>Department manager name</th>
+            <th>Employees names work in that
+                department. </th>
+        </tr>
+    </table>
+    <br> <br>
+    <button onclick="newDepartment()">Add Department</button>
+
+    <script>
+
+        const addDataToTable = (departments) => {
+            const table = document.getElementById('table')
+            departments?.map(depart => {
+                const tr = document.createElement('tr')
+                const tdDepName = document.createElement('td')
+                const tdManName = document.createElement('td')
+                const tdEmpNames = document.createElement('td')
+
+                const a = document.createElement('a')
+                a.style.textDecoration = "underline"
+                a.innerText = depart.department.name
+                a.onclick = () => {
+                    sessionStorage.setItem('department', JSON.stringify(depart.department))
+                    window.location.href = './edit_department.html'
+                }
+                tdDepName.appendChild(a)
+                tdManName.innerText = depart.managerName
+
+                const ul = document.createElement('ul')
+                depart.hereEmp?.map(emp => {
+                    const li = document.createElement('li')
+                    li.style.textDecoration = "underline"
+                    li.innerText = `${emp?.firstName}  ${emp?.lastName}`
+                    li.onclick = () => {
+                        sessionStorage.setItem('employee', JSON.stringify(emp))
+                        window.location.href = './edit_employee.html'
+                    }
+                    ul.appendChild(li)
+                })
+                tdEmpNames.appendChild(ul)
+                tr.appendChild(tdDepName)
+                tr.appendChild(tdManName)
+                tr.appendChild(tdEmpNames)
+                table.appendChild(tr)
+            })
+        }
+
+        const newDepartment = () => {
+            window.location.href = './new_department.html'
+        }
+
+        const loadDepartmentData = async () => {
+            const username = sessionStorage.getItem('username')
+            document.getElementById('username').innerText = username
+
+            const token = sessionStorage.getItem('token')
+            if (!token) {
+                window.location.href = './login.html'
+            }
+            try {
+                const URL_DEPARTS = 'http://127.0.0.1:8080/department/data/toTable'
+                const resp = await fetch(URL_DEPARTS, {
+                    method: 'GET',
+                    headers: { 'x-access-token': token ,
+                    'x-username': username},
+                })
+                const departments = await resp.json()
+                addDataToTable(departments)
+            }
+            catch (e) {
+                console.log(e.message);
+            }
+        }
+
+    </script>
+</body>
+
+</html>

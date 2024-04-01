@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body onload="getEmployeeData()">
+    <h2>Edit Employee</h2>
+    <h3>Hello to: <b id="username"></b> </h3>
+    <a href="./login.html">Log Out</a>
+    <a href="./homePage.html">Home Paga</a>
+    <br> <br>
+    <input type="text" id="id" placeholder="id" disabled /> <br>
+    <input type="text" id="firstName" placeholder="firstName" /> <br>
+    <input type="text" id="lastName" placeholder="lastName" /> <br>
+    <input type="number" id="startWorkYear" placeholder="startWorkYear" /> <br>
+    <input type="text" id="departmentId" placeholder="departmentId" /> <br> <br>
+    <button onclick="updateEmployee()">Update</button>
+    <button onclick="deleteEmployee()">Delete</button>
+    <br> <br>
+    <h4>All his Shifts :</h4>
+    <table id="table" border="1">
+        <tr>
+            <th>Date</th>
+            <th>Starting Hour</th>
+            <th>Ending Hour</th>
+        </tr>
+    </table>
+    <h4>All existing shifts :</h4>
+    <table id="table2" border="1">
+        <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Employees</th>       
+        </tr>
+    </table>
+
+    <script>
+
+        const getEmployeeData = async () => {
+            const name = sessionStorage.getItem('username')
+            document.getElementById('username').innerText = name
+
+            const token = sessionStorage.getItem('token')
+            if (!token || token === undefined) {
+                window.location.href = './login.html'
+            }
+            try {
+                const employee = JSON.parse(sessionStorage.getItem('employee'))
+                if (!employee) {
+                    alert('Not provided employee')
+                    window.location.href = './employees.html'
+                }
+                document.getElementById('id').value = employee._id
+                document.getElementById('firstName').value = employee.firstName
+                document.getElementById('lastName').value = employee.lastName
+                document.getElementById('startWorkYear').value = employee.startWorkYear
+                document.getElementById('departmentId').value = employee.departmentId
+
+                const id = document.getElementById('id').value
+                const URL_EMPLOYEE = `http://127.0.0.1:8080/employee/full/data/${id}`
+
+                const resp = await fetch(URL_EMPLOYEE, {
+                    method: 'GET',
+                    headers: { 'x-access-token': token ,
+                    //'x-username': username
+                },
+                })
+                const employeeData = await resp.json()
+                console.log(employeeData);
+                addDataToTable(employeeData.shiftsId)
+
+                const URL_SHIFTS = 'http://127.0.0.1:8080/shift'
+
+                const res = await fetch(URL_SHIFTS, {
+                    method: 'GET',
+                    headers: { 'x-access-token': token ,
+                    //'x-username': username
+                }
+                })
+                const shifts = await res.json()
+                console.log(shifts);
+                // const shifts2 = shifts.map(shi => shi.employeesId )
+                //                         .map(em => em.map(e=> e._id) )                
+                // const emp3 = shifts2.filter(em => em.indexOf(id) === -1)
+                tableForRegistering(shifts)
+            }
+            catch (e) {
+                console.log(e.message);
+            }
+        }
+
+        const updateEmployee = async () => {
+            const id = document.getElementById('id').value
+            const URL_UPEMPLOYEE = `http://127.0.0.1:8080/employee/${id}`
+
+            const firstName = document.getElementById('firstName').value
+            const lastName = document.getElementById('lastName').value
+            const startWorkYear = document.getElementById('startWorkYear').value
+            const departmentId = document.getElementById('departmentId').value
+
+            const username = sessionStorage.getItem('username')
+            const token = sessionStorage.getItem("token")
+            if (!token) {
+                window.location.href = "./login.html"
+            }
+            try {
+                const resp = await fetch(URL_UPEMPLOYEE, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-access-token": token,
+                        'x-username': username
+                    },
+                    body: JSON.stringify(
+                        { firstName, lastName, startWorkYear, departmentId }
+                    )
+                })
+                const status = await resp.json()
+                //console.log(status);
+                window.location.href = './employees.html'
+            }
+            catch (e) {
+                console.log(e.message);
+            }
+        }
+
+        const deleteEmployee = async () => {
+            const id = document.getElementById('id').value
+            const URL_DELEMPLOYEE = `http://127.0.0.1:8080/employee/${id}`
+
+            const username = sessionStorage.getItem('username')
+            const token = sessionStorage.getItem("token")
+            if (!token) {
+                window.location.href = "./login.html"
+            }
+            try {
+                const respon = await fetch(URL_DELEMPLOYEE, {
+                    method: 'DELETE',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-access-token": token,
+                        'x-username': username
+                    }
+                })
+                const status = await respon.json()
+                console.log(status);
+               // window.location.href = './employees.html'
+            }
+            catch (e) {
+                console.log(e.message);
+            }
+        }
+
+        const addDataToTable = (empShifts) => {
+
+            const table = document.getElementById('table')
+            empShifts.map(shift => {
+                const tr = document.createElement('tr')
+                const tdDate = document.createElement('td')
+                const tdStar = document.createElement('td')
+                const tdEnd = document.createElement('td')
+
+                tdDate.innerText = shift.date
+                tdStar.innerText = shift.startingHour
+                tdEnd.innerText = shift.endingHour
+
+                tr.appendChild(tdDate)
+                tr.appendChild(tdStar)
+                tr.appendChild(tdEnd)
+                table.appendChild(tr)
+            })
+        }
+        const tableForRegistering = (shifts) => {
+            const table = document.getElementById('table2')
+            shifts.map(shi => {
+                const tr = document.createElement('tr')
+                const tdDate = document.createElement('td')
+                const tdTime = document.createElement('td')
+                const tdEmploy = document.createElement('td')
+                // const tdRegist = document.createElement('td')
+                const ul = document.createElement('ul')
+
+                tdDate.innerText = shi.date
+                tdTime.innerText = `${shi.startingHour} - ${shi.endingHour}`
+                shi.employeesId.map(em => {
+                    const li = document.createElement('li')
+                    li.innerText = `${em.firstName}  ${em.lastName}`
+                    ul.appendChild(li)
+                })
+                tdEmploy.appendChild(ul)
+                const button = document.createElement('button')
+                const firstName = document.getElementById('firstName').value
+
+                button.innerText = `Register ${firstName} ?`
+                button.onclick = () => { registerEmployee(shi) }
+
+            const id = document.getElementById('id').value
+               const employees = shi.employeesId.map(emp => emp._id)
+               if(employees.indexOf(id) === -1){
+                tdEmploy.appendChild(button)
+               }                
+                // tdRegist.innerText = '✔'
+                //tdRegist.onclick = () => {}
+
+                tr.appendChild(tdDate)
+                tr.appendChild(tdTime)
+                tr.appendChild(tdEmploy)
+                //tr.appendChild(tdRegist)
+                table.appendChild(tr)
+            })
+        }
+
+        const registerEmployee = async(shi) => {
+            console.log('mm');
+            console.log(shi);
+            const empId = document.getElementById('id').value
+            const username = sessionStorage.getItem('username')
+            const token = sessionStorage.getItem('token')
+            if (!token) {
+                window.location.href = './login.html'
+            }
+            try {
+                 const URL_SHIFT = `http://127.0.0.1:8080/shift/${shi._id}`
+                 const URL_EMPLOYEE = `http://127.0.0.1:8080/employee/${empId}`
+
+
+                 const resp = await fetch(URL_SHIFT, {
+                    method: 'GET',
+                    headers: { 'x-access-token': token ,
+                    //'x-username': username
+                }
+                })
+                const shift = await resp.json()               
+                const empToShift = shift.employeesId.push(empId)
+                 console.log(shift);
+                 const res = await fetch(URL_SHIFT, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-access-token": token,
+                        //'x-username': username
+                    },
+                    body: JSON.stringify(shift)                       
+               })
+                const status = await res.json()
+                console.log(status);
+
+                const respon = await fetch(URL_EMPLOYEE, {
+                    method: 'GET',
+                    headers: { 'x-access-token': token ,
+                    //'x-username': username
+                },
+                })
+                const employee = await respon.json()
+                const shiftToEmp = employee.shiftsId.push(shi._id)
+                console.log(employee);
+                const response = await fetch(URL_EMPLOYEE, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-access-token": token,
+                        'x-username': username
+                    },
+                    body: JSON.stringify(employee)                       
+               })
+                const upStatus = await response.json()
+                console.log(upStatus);
+                window.location.href = "./edit_employee.html"   
+             }
+            catch (e) {
+                console.log(e.message);
+            }
+        }
+    </script>
+</body>
+
+</html>

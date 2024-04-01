@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body onload="getShiftsData()">
+    <h2>Shifts</h2>
+    <h3>Hello to: <b id="username"></b> </h3>
+    <a href="./login.html">Log Out</a>
+    <a href="./homePage.html">Home Paga</a>
+    <br> <br>
+    <h3>Press on shift to edit it :</h3>
+    <ul id="ul"></ul>
+    <input type="text" id="id" placeholder="id" /> <br>
+    <input type="text" id="date" placeholder="date" /> <br>
+    <input type="text" id="startingHour" placeholder="startingHour" /> <br>
+    <input type="text" id="endingHour" placeholder="endingHour" /> <br>
+    <br>
+    <button onclick="createShift()">Add Shift</button>
+    <button onclick="updateShift()">Update</button> <br> 
+    <h4>This shift's employees :</h4>
+    <ol id="ol"></ol>
+    <h4>Add employee to this shift</h4>
+    <select id="select" onchange="chooseEmployee()">
+    <!-- <option value=" "></option> -->
+    </select>
+
+    <script>
+
+        const getShiftsData = async () => {
+            const username = sessionStorage.getItem('username')
+            document.getElementById('username').innerText = username
+
+            const token = sessionStorage.getItem('token')
+            if (!token) {
+                window.location.href = './login.html'
+            }
+            try {
+                const URL_SHIFTS = 'http://127.0.0.1:8080/shift'
+
+                const resp = await fetch(URL_SHIFTS, {
+                    method: 'GET',
+                    headers: { 'x-access-token': token ,
+                    //'x-username': username
+                }
+                })
+                const shifts = await resp.json()
+                console.log(shifts);
+                addDataToList(shifts)
+            }
+            catch (e) {
+                console.log(e.message);
+            }
+        }
+        const addDataToList = (shifts) => {
+            console.log(shifts);
+            const ul = document.getElementById('ul')
+            shifts.map(shi => {
+                const li = document.createElement('li')
+                li.innerText = `Date: ${shi.date} , Time: ${shi.startingHour} - ${shi.endingHour} -👈`
+
+                li.onclick = () => {
+                    const ol = document.getElementById('ol')
+                    ol.innerHTML = ''
+
+                    sessionStorage.setItem('shift', JSON.stringify(shi))
+                    document.getElementById('id').value = shi._id
+                    document.getElementById('date').value = shi.date
+                    document.getElementById('startingHour').value = shi.startingHour
+                    document.getElementById('endingHour').value = shi.endingHour
+                    // window.location.href = './shifts.html'
+
+                    shi.employeesId.map(emp => {
+                        const li = document.createElement('li')
+                        li.innerText = `${emp.firstName}  ${emp.lastName}`
+                        ol.appendChild(li)
+                    })
+
+                }
+                ul.appendChild(li)
+            })
+            allocateEmployee()
+        }
+
+        const createShift = async () => {
+
+            const URL_SHIFTS = 'http://127.0.0.1:8080/shift'
+
+            const username = sessionStorage.getItem('username')
+            const token = sessionStorage.getItem('token')
+            if (!token) {
+                window.location.href = './login.html'
+            }
+            try {
+                const date = document.getElementById('date').value
+                const startingHour = document.getElementById('startingHour').value
+                const endingHour = document.getElementById('endingHour').value
+
+                const resp = await fetch(URL_SHIFTS, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-access-token": token,
+                        'x-username': username
+                    },
+                    body: JSON.stringify({
+                        date, startingHour, endingHour
+                    })
+                })
+                const status = await resp.json()
+                //console.log(status);
+                window.location.href = './shifts.html'
+            }
+            catch (e) {
+                console.log(e.message);
+            }
+        }
+
+        const updateShift = async () => {
+            const token = sessionStorage.getItem('token')
+            if (!token) {
+                window.location.href = './login.html'
+            }
+            //const shift = JSON.parse(sessionStorage.getItem('shift')) 
+            //if (!shift) {
+            //   alert('Not shift provided, please click on one shift')
+            //  window.location.href = }           
+            try {
+                const id = document.getElementById('id').value
+                const URL_UPSHIFT = `http://127.0.0.1:8080/shift/${id}`
+
+                const date = document.getElementById('date').value
+                const startingHour = document.getElementById('startingHour').value
+                const endingHour = document.getElementById('endingHour').value
+                const username = sessionStorage.getItem('username')
+
+                const resp = await fetch(URL_UPSHIFT, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-access-token": token,
+                        'x-username': username
+                    },
+                    body: JSON.stringify({
+                        date, startingHour, endingHour
+                    })
+                })
+                const status = await resp.json()
+                // console.log(status);
+                window.location.href = './shifts.html'
+            }
+            catch (e) {
+                console.log(e.message);
+            }
+        }
+
+        const allocateEmployee = async () => {
+            const select = document.getElementById('select')
+            select.innerHTML = ''
+            const URL_EMPLOYEE = 'http://127.0.0.1:8080/employee'
+
+            const username = sessionStorage.getItem('username')
+            const token = sessionStorage.getItem('token')
+            if (!token) {
+                window.location.href = "./login.html"
+            }
+            try {
+                const resp = await fetch(URL_EMPLOYEE, {
+                    method: 'GET',
+                    headers: { 'x-access-token': token,
+                   // 'x-username': username 
+                },
+                })
+                const employees = await resp.json()
+                console.log(employees);
+                employees.map(emp => {
+                    const option = document.createElement('option')
+                    option.value = emp._id
+                    option.innerText = `${emp.firstName}  ${emp.lastName}`
+                    select.appendChild(option)
+                })
+            }
+            catch (e) {
+                console.log(e.message)
+                // window.location.href = "./login.html"
+            }
+        }
+        const chooseEmployee = async() => {
+            const shiftId = document.getElementById('id').value
+            const username = sessionStorage.getItem('username')
+            if(!shiftId || shiftId === ''){
+                alert('Press on shift')
+                window.location.href = './shifts.html'
+            }
+            const token = sessionStorage.getItem('token')
+            if (!token) {
+                window.location.href = './login.html'
+            }
+            try {
+                console.log(event.target.value);
+                const empId = event.target.value
+                const URL_SHIFTS = `http://127.0.0.1:8080/shift/${shiftId}`
+                const URL_EMPLOYEE = `http://127.0.0.1:8080/employee/${empId}`
+
+                const resp = await fetch(URL_SHIFTS, {
+                    method: 'GET',
+                    headers: { 'x-access-token': token,
+                    //'x-username': username 
+                }
+                })
+                const shift = await resp.json()               
+                const empToShift = shift.employeesId.push(empId)
+                 console.log(shift);
+                 const res = await fetch(URL_SHIFTS, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-access-token": token,
+                        //'x-username': username
+                    },
+                    body: JSON.stringify(shift)                       
+               })
+                const status = await res.json()
+
+                const respon = await fetch(URL_EMPLOYEE, {
+                    method: 'GET',
+                    headers: { 'x-access-token': token,
+                    //'x-username': username 
+                },
+                })
+                const employee = await respon.json()
+                const shiftToEmp = employee.shiftsId.push(shiftId)
+                console.log(employee);
+                const response = await fetch(URL_EMPLOYEE, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-access-token": token,
+                        'x-username': username
+                    },
+                    body: JSON.stringify(employee)                       
+               })
+                const upStatus = await response.json()
+                window.location.href = "./shifts.html"
+            }
+            catch (e) {
+                console.log(e.message);
+            }
+        }
+    </script>
+</body>
+
+</html>

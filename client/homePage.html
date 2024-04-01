@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body onload="getName()">
+
+    <h1>HOME PAGE</h1>
+
+    <h2 id="username"></h2>
+
+    <a href="./login.html">Log Out</a> </br>
+    <a href="./employees.html">Employee</a> </br>
+    <a href="./edit_employee.html">Edit Employee</a> </br>
+    <a href="./new_employee.html">New Employee</a> <br>
+    <a href="./departments.html">Departments</a> <br>
+    <a href="./edit_department.html">Edit Departments</a> <br>
+    <a href="./new_department.html">New Departments</a> <br>
+    <a href="./shifts.html">Shifts</a> <br>
+    <a href="./users.html">Users</a> <br>
+
+
+    <script>
+        const getName = () => {
+            const token = sessionStorage.getItem('token')
+            // if(!token){ 
+            //     window.location.href = './login.html'
+            // }
+            !token && (window.location.href = './login.html')
+            const name = sessionStorage.getItem('username')
+            document.getElementById('username').innerText = name
+        }
+    </script>
+
+</body>
+
+</html>

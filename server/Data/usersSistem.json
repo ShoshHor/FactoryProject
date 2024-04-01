@@ -1,0 +1,156 @@
+{
+  "actions": [
+    {
+      "userId": 1,
+      "username": "Bret",
+      "fullName": "Leanne Graham",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 5
+    },
+    {
+      "userId": 2,
+      "username": "Antonette",
+      "fullName": "Ervin Howell",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 5
+    },
+    {
+      "userId": 3,
+      "username": "Samantha",
+      "fullName": "Clementine Bauch",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 5
+    },
+    {
+      "userId": 4,
+      "username": "Karianne",
+      "fullName": "Patricia Lebsack",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 5
+    },
+    {
+      "userId": 5,
+      "username": "Kamren",
+      "fullName": "Chelsey Dietrich",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 5
+    },
+    {
+      "userId": 6,
+      "username": "Leopoldo_Corkery",
+      "fullName": "Mrs. Dennis Schulist",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 5
+    },
+    {
+      "userId": 7,
+      "username": "Elwyn.Skiles",
+      "fullName": "Kurtis Weissnat",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 5
+    },
+    {
+      "userId": 8,
+      "username": "Maxime_Nienow",
+      "fullName": "Nicholas Runolfsdottir V",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 5
+    },
+    {
+      "userId": 9,
+      "username": "Delphine",
+      "fullName": "Glenna Reichert",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 5
+    },
+    {
+      "userId": 10,
+      "username": "Moriah.Stanton",
+      "fullName": "Clementina DuBuque",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 5
+    },
+    {
+      "userId": 2,
+      "username": "Antonette",
+      "fullName": "Ervin Howell",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 4
+    },
+    {
+      "userId": 2,
+      "username": "Antonette",
+      "fullName": "Ervin Howell",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 3
+    },
+    {
+      "userId": 2,
+      "username": "Antonette",
+      "fullName": "Ervin Howell",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 2
+    },
+    {
+      "userId": 1,
+      "username": "Bret",
+      "fullName": "Leanne Graham",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 4
+    },
+    {
+      "userId": 1,
+      "username": "Bret",
+      "fullName": "Leanne Graham",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 3
+    },
+    {
+      "userId": 1,
+      "username": "Bret",
+      "fullName": "Leanne Graham",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 5
+    },
+    {
+      "userId": 1,
+      "username": "Bret",
+      "fullName": "Leanne Graham",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 5
+    },
+    {
+      "userId": 2,
+      "username": "Antonette",
+      "fullName": "Ervin Howell",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 5
+    },
+    {
+      "userId": 2,
+      "username": "Antonette",
+      "fullName": "Ervin Howell",
+      "maxActions": 5,
+      "date": "20/3/2024",
+      "numActionsAllowd": 5
+    }
+  ]
+}

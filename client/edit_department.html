@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body onload="loadDepartmentData()">
+    <h2>Edit Department</h2>
+    <h3>Hello to: <b id="username"></b> </h3>
+    <a href="./login.html">Log Out</a>
+    <a href="./homePage.html">Home Paga</a>
+    <br> <br>
+    <input type="text" id="id" placeholder="id" disabled /> <br>
+    <input type="text" id="name" placeholder="name" /> <br>
+    <input type="text" id="manager" placeholder="manager" /> <br>
+    <br>
+    <button onclick="updateDepartment()">Update</button>
+    <button onclick="deleteDepartment()">Delete</button>
+    <br>
+    <h4>Others employees :</h4>
+    <select id="select" onchange="saveEmployee()">
+    </select>
+    <button id="button" onclick="allocateEmpToDepart()">Add</button>
+    <script>
+
+        const loadDepartmentData = async () => {
+            const username = sessionStorage.getItem('username')
+            document.getElementById('username').innerText = username
+
+            const token = sessionStorage.getItem('token')
+            if (!token) {
+                window.location.href = './login.html'
+            }
+            const department = JSON.parse(sessionStorage.getItem('department'))
+            if (!department) {
+                alert('Not provided department')
+                window.location.href = './departments.html'
+            }
+            console.log(department);
+            document.getElementById('id').value = department._id
+            document.getElementById('name').value = department.name
+            document.getElementById('manager').value = department.manager
+
+            const URL_EMPLOYEES = 'http://127.0.0.1:8080/employee'
+
+            const resp = await fetch(URL_EMPLOYEES, {
+                method: 'GET',
+                headers: { 'x-access-token': token ,
+                //'x-username': username
+            },
+            })
+            const employees = await resp.json()
+            const id = document.getElementById('id').value
+            const otherEmp = employees.filter(em => em.departmentId !== id)
+            console.log(otherEmp);
+            addToSelect(otherEmp)
+        }
+        const updateDepartment = async () => {
+            const id = document.getElementById('id').value
+            const name = document.getElementById('name').value
+            const manager = document.getElementById('manager').value
+
+            const username = sessionStorage.getItem('username')
+
+            const URL_UPDEPART = `http://127.0.0.1:8080/department/${id}`
+
+            const token = sessionStorage.getItem("token")
+            if (!token) {
+                window.location.href = "./login.html"
+            }
+            try {
+                const resp = await fetch(URL_UPDEPART, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-access-token": token,
+                        'x-username': username
+                    },
+                    body: JSON.stringify({
+                        name, manager
+                    })
+                })
+                const status = await resp.json()
+                console.log(status);
+            } catch (e) {
+                console.log(e.message);
+            }
+        }
+        const deleteDepartment = async () => {
+            const id = document.getElementById('id').value
+            const URL_DELDEPART = `http://127.0.0.1:8080/department/${id}`
+            const URL_EMPLOYEES = 'http://127.0.0.1:8080/employee'
+
+            const username = sessionStorage.getItem('username')
+            const token = sessionStorage.getItem("token")
+            if (!token) {
+                window.location.href = "./login.html"
+            }
+            try {
+                const resp = await fetch(URL_DELDEPART, {
+                    method: 'DELETE',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-access-token": token,
+                        'x-username': username
+                    },
+                })
+                const status = await resp.json()
+                console.log(status);
+
+                const res = await fetch(URL_EMPLOYEES, {
+                    method: 'GET',
+                    headers: { 'x-access-token': token ,
+                    //'x-username': username
+                },
+                })
+                const employees = await res.json()
+                employees.map(emp => {
+                    if (emp.departmentId === id) {
+                        emp.departmentId = '000000000000000000000000'
+                    }
+                })
+                console.log(employees);
+            } catch (e) {
+                console.log(e.message)
+            }
+        }
+
+        const addToSelect = (otherEmp) => {
+            const select = document.getElementById('select')
+            otherEmp.map(emp => {
+                const option = document.createElement('option')
+                option.value = emp._id
+                option.innerText = `${emp.firstName}  ${emp.lastName}`
+                select.appendChild(option)
+            })
+        }
+        const saveEmployee = () => {
+            console.log(event.target.value);
+            sessionStorage.setItem('idEmployee', event.target.value)
+        }
+
+        const allocateEmpToDepart = async () => {
+            const idEmp = sessionStorage.getItem('idEmployee')
+            console.log(idEmp);
+            const URL_EMPLOYEE = `http://127.0.0.1:8080/employee/${idEmp}`
+
+            const username = sessionStorage.getItem('username')
+            const token = sessionStorage.getItem("token")
+            if (!token) {
+                window.location.href = "./login.html"
+            }
+            try {
+            const idDep = document.getElementById('id').value
+                const obj = {departmentId: idDep}
+                const resp = await fetch(URL_EMPLOYEE, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-access-token": token,
+                    },
+                    body: JSON.stringify(obj)
+                })
+                const status = await resp.json()
+                console.log(status);
+            const URL_DEPARTS = `http://127.0.0.1:8080/department`
+
+                const res = await fetch(URL_DEPARTS, {
+                    method: 'GET',
+                    headers: { 'x-access-token': token ,
+                },
+                })
+                const departments = await res.json()
+                departments.map(async(de)=> {
+                    if(de.manager === idEmp){
+            const URL_DEPART = `http://127.0.0.1:8080/department/${de._id}`
+            
+            const obj = {manager: "000000000000000000000000"}
+                const resp = await fetch(URL_DEPART, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-access-token": token,
+                        'x-username': username
+                    },
+                    body: JSON.stringify(obj)
+                })
+                const status = await resp.json()
+                console.log(status);                       
+                    }
+                })
+
+            } catch (e) {
+                console.log(e.message);
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

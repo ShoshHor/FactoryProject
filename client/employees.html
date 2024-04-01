@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body onload="getEmployees()">
+
+    <h2>Employees Page</h2>
+    <h3>Hello to: <b id="username"></b> </h3>
+    <a href="./login.html">Log Out</a>
+    <a href="./homePage.html">Home Paga</a>
+    <br> <br>
+    <table id="table" border="1">
+        <tr>
+            <th>Fullname</th>
+            <th>Department</th>
+            <th>All Shifts</th>
+        </tr>
+    </table>
+    <br> <br>
+    <button id="addEmployee" onclick="addEmployee()">Add Employee</button>
+
+    <h4>Choose department:</h4>
+    <select id="select" onchange="chooseDepartment()">
+    </select> <br> <br>
+     <button id="back" onclick="BackToTheTable()">Back to all the table</button>
+    <script>
+        const addEmployeeDataToTable = (employees) => {           
+            const table = document.getElementById('table')
+            table.innerHTML = ''
+            employees.map(emp => {
+                const tr = document.createElement('tr')
+                const tdFullname = document.createElement('td')
+                const tdDepart = document.createElement('td')
+                const tdShifts = document.createElement('td')
+
+                const a = document.createElement('a')
+                //a.href = './edit_employee.html'
+                a.innerText = emp.fullname
+                a.style.textDecoration = "underline"
+                a.onclick = () => {
+                    sessionStorage.setItem('employee', JSON.stringify(emp.employee))
+                    window.location.href = './edit_employee.html'
+                }
+                tdFullname.appendChild(a)
+
+                const a2 = document.createElement('a')
+                //a2.href = './edit_department.html'
+                a2.innerText = emp.department.name
+                a2.style.textDecoration = "underline"
+                a2.onclick = () => {
+                    sessionStorage.setItem('department', JSON.stringify(emp.department))
+                    window.location.href = './edit_department.html'
+                }
+                tdDepart.appendChild(a2)
+
+                const ul = document.createElement('ul')
+                emp.allShifts.map(shi => {
+                    const liShift = document.createElement('li')
+                    liShift.innerText = `Date: ${shi.date} , Time: ${shi.time}`
+                    ul.appendChild(liShift)
+                })
+                tdShifts.appendChild(ul)
+
+                tr.appendChild(tdFullname)
+                tr.appendChild(tdDepart)
+                tr.appendChild(tdShifts)
+                table.appendChild(tr)
+            })
+        }
+
+        const getEmployees = async () => {
+
+            const name = sessionStorage.getItem('username')
+            document.getElementById('username').innerText = name
+
+            const URL_EMPLOYEE = 'http://127.0.0.1:8080/employee/data/toTable'
+            const URL_DEPS = 'http://127.0.0.1:8080/department'
+
+            const token = sessionStorage.getItem('token')
+            if (!token) {
+                window.location.href = "./login.html"
+            }
+            try {
+                const resp = await fetch(URL_EMPLOYEE, {
+                    method: 'GET',
+                    headers: {
+                        'x-access-token': token,
+                        'x-username': name
+                    },
+                })
+                const employeesData = await resp.json()
+                console.log(employeesData);
+                addEmployeeDataToTable(employeesData)
+
+                const res = await fetch(URL_DEPS, {
+                    method: 'GET',
+                    headers: { 'x-access-token': token }
+                })
+                const departments = await res.json()
+                addDataToSelect(departments)
+            }
+            catch (e) {
+                console.log(e.message)
+                // window.location.href = "./login.html"
+            }
+        }
+
+        const addEmployee = () => {
+            window.location.href = "./new_employee.html"
+        }
+
+        const addDataToSelect = (departments) => {
+            const select = document.getElementById('select')
+            departments.map(dep => {
+                const option = document.createElement('option')
+                option.innerText = dep.name
+                option.value = dep._id
+                select.appendChild(option)
+            })
+        }
+
+        const chooseDepartment = async () => {
+
+            const depId = event.target.value
+
+            const token = sessionStorage.getItem('token')
+            if (!token) {
+                window.location.href = "./login.html"
+            }
+            try {
+                const URL_EMPLOYEES = 'http://127.0.0.1:8080/employee/data/toTable'
+                const respon = await fetch(URL_EMPLOYEES, {
+                    method: 'GET',
+                    headers: {
+                        'x-access-token': token }
+                })
+                const employees = await respon.json()
+                console.log(employees);
+                const filteredEmps = employees.filter(emp => emp.department._id === depId)
+                console.log(filteredEmps);
+                addEmployeeDataToTable(filteredEmps)
+            }
+            catch (e) {
+                console.log(e.message)
+            }
+        }
+
+        const BackToTheTable = () => {
+            window.location.href = "./employees.html"
+        }
+
+
+    </script>
+</body>
+
+</html>

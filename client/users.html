@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body onload="getUsersData()">
+    <h2>Users</h2>
+    <h3>Hello to: <b id="username"></b> </h3>
+    <a href="./login.html">Log Out</a>
+    <a href="./homePage.html">Home Paga</a>
+    <br> <br>
+
+    <table border="1" id="table">
+        <tr>
+            <th>Username</th>
+            <th>Full name</th>
+            <th>Actions per day</th>
+            <th>Actions remaining</th>
+        </tr>
+    </table>
+
+    <script>
+
+        const getUsersData = async() => {
+            const username = sessionStorage.getItem('username')
+            document.getElementById('username').innerText = username
+
+            const token = sessionStorage.getItem('token')
+            if (!token) {
+                window.location.href = './login.html'
+            }
+            try {
+                const URL_USERS = 'http://127.0.0.1:8080/users/JF/toTable'
+                const resp = await fetch(URL_USERS, {
+                    method: 'GET',
+                    headers: { 'x-access-token': token },
+                })
+                const users = await resp.json()
+                addDataToTable(users)
+            }
+            catch (e) {
+                console.log(e.message);
+            }
+        }
+
+        const addDataToTable = (users) => {
+            const table = document.getElementById('table')
+            users.map(user => {
+                const tr = document.createElement('tr')
+                const tdUsername = document.createElement('td')
+                const tdFullName = document.createElement('td')
+                const tdMaxActions = document.createElement('td')
+                const tdRemaining = document.createElement('td')
+
+                tdUsername.innerText = user.username 
+                tdFullName.innerText = user.fullName
+                tdMaxActions.innerText = user.maxActions
+                tdRemaining.innerText = user.numActionsAllowd
+
+                tr.appendChild(tdUsername)
+                tr.appendChild(tdFullName)
+                tr.appendChild(tdMaxActions)
+                tr.appendChild(tdRemaining)
+                table.appendChild(tr)
+            })
+        }
+
+    </script>
+</body>
+</html>

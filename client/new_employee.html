@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body onload="loadAllData()">
+    <h2>Add Employee</h2>
+    <h3>Hello to: <b id="username"></b> </h3>
+    <a href="./login.html">Log Out</a>
+    <a href="./homePage.html">Home Paga</a>
+    <br> <br>
+
+    <input type="text" id="firstName" placeholder="firstName" /> <br>
+    <input type="text" id="lastName" placeholder="lastName" /> <br>
+    <input type="number" id="startWorkYear" placeholder="startWorkYear" /> <br>
+    <input type="text" id="departmentId" placeholder="departmentId" /> <br>
+    <br>
+    <button onclick="saveToDB()">Save</button>
+    <button onclick="cancel()">Cancel</button>
+
+    <script>
+
+        const loadAllData = () => {
+            const name = sessionStorage.getItem('username')
+            document.getElementById('username').innerText = name
+
+            const token = sessionStorage.getItem('token')
+            if (!token) {
+                window.location.href = './login.html'
+            }
+        }
+
+        const saveToDB = async () => {
+            const URL_EMPLOYEES = 'http://127.0.0.1:8080/employee'
+
+            const firstName = document.getElementById('firstName').value
+            const lastName = document.getElementById('lastName').value
+            const startWorkYear = +document.getElementById('startWorkYear').value
+            const departmentId = document.getElementById('departmentId').value
+            const username = sessionStorage.getItem('username')
+
+            const token = sessionStorage.getItem('token')
+            if (!token) {
+                window.location.href = './login.html'
+            }
+            try {
+                const resp = await fetch(URL_EMPLOYEES, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-access-token": token,
+                        'x-username': username
+                    },
+                    body: JSON.stringify(
+                        { firstName, lastName, startWorkYear, departmentId }
+                    )
+                })
+                const status = await resp.json()
+                window.location.href = './employees.html'
+            }
+            catch (e) {
+                console.log(e.message)
+            }
+        }
+
+        const cancel = () => {
+            window.location.href = './employees.html'
+        }
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body onload="loadData()" >
+    <h2>Add Department</h2>
+    <h3>Hello to: <b id="username"></b> </h3>
+    <a href="./login.html">Log Out</a>
+    <a href="./homePage.html">Home Paga</a>
+    <br> <br>
+    <input type="text" id="name" placeholder="name" /> <br>
+    <input type="text" id="manager" placeholder="manager" /> <br>
+    <br>
+    <button onclick="addDepartment()">Save</button>
+    <button onclick="cancelCreating()">Cancel</button>
+
+    <script>
+
+        const loadData = async() => {
+            const username = sessionStorage.getItem('username')
+            document.getElementById('username').innerText = username
+
+            const token = sessionStorage.getItem('token')
+            if(!token){
+                window.location.href = './departments.html'
+            }
+        }
+
+        const addDepartment = async() => {
+            const URL_DEPART = 'http://127.0.0.1:8080/department'
+
+            const name = document.getElementById('name').value
+            const manager = document.getElementById('manager').value
+            const username = sessionStorage.getItem('username')
+
+            const token = sessionStorage.getItem('token')
+            if(!token){
+                window.location.href = './departments.html'
+            }
+            try{ 
+            const resp = await fetch(URL_DEPART, {
+                method : 'POST',
+                headers:{
+                        "Content-Type": "application/json",
+                        "x-access-token": token,
+                        'x-username': username
+                    },
+                body : JSON.stringify({
+                    name, manager
+                })    
+            })
+            const status = await resp.json()
+            console.log(status);
+
+        } catch(e){
+            console.log(e.message);
+         }
+        }
+
+        const cancelCreating = () => {
+            window.location.href = './departments.html'
+        }
+
+    </script>
+
+</body>
+</html>
