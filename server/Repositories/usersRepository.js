@@ -26,12 +26,6 @@ const insertDefaultUsers = async() => {
     console.log('Users already exist in the database');
 }
 }
-insertDefaultUsers()
-
-// User.post('save', async function(doc, next) {
-//     await insertDefaultUsers()
-//     next()
-// })
 
 //get all
 const getAllUsers = async() => {
@@ -44,7 +38,8 @@ const getUserById = async(id) => {
 }
 module.exports = {
     getAllUsers,
-    getUserById
+    getUserById,
+    insertDefaultUsers
 }
 
 
